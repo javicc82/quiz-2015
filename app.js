@@ -28,6 +28,17 @@ app.use(session());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function(req, res, next) {
+  if (req.session.user) {
+    if (Date.now() - req.session.user.lastRequest > 2*60*1000) {
+      delete req.session.user;
+    } else {
+      req.session.user.lastRequest = Date.now();
+    }
+  }
+  next();
+});
+
 // Helpers dinamicos:
 app.use(function(req, res, next) {
 
